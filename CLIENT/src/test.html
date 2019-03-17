@@ -1,0 +1,28 @@
+<html>
+    <head>
+        
+    </head>
+    <body>
+        <script lang="text/javascript">
+            // https://swapi.co/api/people/1/
+            const getTasks = () => {
+                const options = {
+                    method: 'GET',
+                    headers: new Headers({
+                        "method": 'GET',
+                        "Content-Type": "application/json",
+                        // "Access-Control-Allow-Origin": "*"
+                    })
+                }
+
+                return fetch(`http://127.0.0.1:5000/diary/api/tasks`, options)
+                        .then( res  => res.json() )
+                        .then( tasks => console.log(tasks) )
+                
+            }
+            
+
+            getTasks()
+        </script>
+    </body>
+</html>
