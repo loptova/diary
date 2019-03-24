@@ -18,15 +18,28 @@
         </div>
       </div>
       <div v-else class="days-grid">
-        <div v-for="i in 31" class="day">
-          {{ i }}<br>
+        <div v-for="i in 31" class="day" v-on:click="dayClicker(self, i)">
+          <strong>{{ i }}</strong><br>
           <div v-for="task in tasksByMAY['tasks']" v-if="task['day_num'] == i">
             {{ task['task_title'] }}
           </div>
         </div>
       </div>
     </div>
-    <!-- <h3 v-for="i in tasksByMAY['tasks']">{{ i }}<br></h3> -->
+    <div class="detailedDayModal" :class="!isDetailedDayModal || isDetailedDayModal === undefined ? 'hidden' : ''">
+      <div class="modal-block">
+        <div>
+          {{ selectedDay.day_num }}
+        </div>
+        
+        <div class="modal-footer">
+          <b-button @click="addTask" class="search-button" variant="primary">добавить</b-button>
+          <b-button @click="isDetailedDayModal = false" class="search-button" >закрыть</b-button>
+        </div>
+        
+
+      </div>
+    </div>
   </div>
 </template>
 
@@ -35,9 +48,6 @@
 window.tasksByMAY = []
 
 export default {
-  // a: '123',
-  
-
   data () {
     return {
       self: this,
@@ -47,6 +57,8 @@ export default {
       i: 0,
       selectedMonth: null,
       selectedYear: null,
+      selectedDay: "",
+      isDetailedDayModal: undefined,
       
       options: {
         months: [
@@ -76,7 +88,8 @@ export default {
   computed: {
     
   },
-  methods: {
+  methods:{
+
     getTasks () {
       var xhr = new XMLHttpRequest();
       xhr.open('GET', 'http://127.0.0.1:5000/diary/api/tasks', false);
@@ -87,6 +100,7 @@ export default {
         return xhr.responseText // responseText -- текст ответа.
       }
     },
+
     getTasksByMonthAndYear(self, month, year) {
       var _month = new Date('1 '+ month +' 1999').getMonth()
       _month += 1
@@ -100,6 +114,22 @@ export default {
         self.tasksByMAY = JSON.parse(xhr.responseText) // responseText -- текст ответа.
         self.openDays = true
       }
+    },
+
+    dayClicker(self, _day_num) {
+      var clickedDay = {
+        day_num: _day_num,
+        day_tasks: [] 
+      }
+      self.tasksByMAY['tasks'].forEach(day => {
+        day['day_num'] === _day_num ? clickedDay.day_tasks.push(day['task_title']) : "";
+      });
+      self.selectedDay = clickedDay
+      self.isDetailedDayModal = true
+    },
+
+    addTask() {
+      alert('123')
     }
   }
 }
@@ -152,5 +182,41 @@ body{
 
 .search-button {
   width: 100%;
+}
+.detailedDayModal {
+  position: fixed;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	left: 0;
+	background: rgba(0,0,0,0.8);
+	z-index: 99999;
+	-webkit-transition: opacity 400ms ease-in;
+	-moz-transition: opacity 400ms ease-in;
+	transition: opacity 400ms ease-in;
+  display: flex;
+  justify-content: center;
+
+  padding-top: 250px;
+	/* pointer-events: none; */
+}
+.modal-block {
+  width: 500px;  
+  height: 250px;
+  /* height: auto; */
+  text-align: center;
+  padding: 30px 50px;
+  background: white;
+  border-radius: 10px;
+  display: flex;
+  flex-direction: column;
+}
+
+.modal-footer {
+  flex-grow: 1;
+}
+
+.hidden {
+  display: none;
 }
 </style>
